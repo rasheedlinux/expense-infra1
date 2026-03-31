@@ -1,5 +1,6 @@
 module "db" {
   source = "terraform-aws-modules/rds/aws"
+  version = "7.2.0"
 
   identifier = local.resource_name #expense-dev
 
@@ -11,8 +12,9 @@ module "db" {
   db_name  = "transactions"
   username = "root"
   manage_master_user_password = false
-  password = "ExpenseApp1"
+  master_password = "ExpenseApp1"
   port     = "3306"
+
 
   vpc_security_group_ids = [local.mysql_sg_id]
   skip_final_snapshot = true
