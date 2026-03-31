@@ -61,12 +61,11 @@ module "db" {
 }
 
 module "records" {
-  source  = "terraform-aws-modules/route53/aws//modules/records"
+  source  = "terraform-aws-modules/route53/aws"
 
   zone_name = var.zone_name
 
   records = [
-    
     {
       name    = "mysql-${var.environment}" #mysql-dev.daws81s.online
       type    = "CNAME"
@@ -77,5 +76,4 @@ module "records" {
       allow_overwrite = true
     },
   ]
-
 }
