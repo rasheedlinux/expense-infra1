@@ -63,7 +63,7 @@ module "db" {
 module "records" {
   source  = "terraform-aws-modules/route53/aws"
 
-  zone_name = var.zone_name
+  zone_name = var.zone_id
 
   records = [
     {
