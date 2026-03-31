@@ -11,8 +11,7 @@ module "db" {
 
   db_name  = "transactions"
   username = "root"
-  manage_master_user_password = false
-  master_password = "ExpenseApp1"
+  manage_master_user_password = true
   port     = "3306"
 
 
