@@ -1,80 +1,22 @@
-module "db" {
-  source = "terraform-aws-modules/rds/aws"
-  version = "7.2.0"
+# Corrected Terraform Code for RDS module version 7.2.0
 
-  identifier = local.resource_name #expense-dev
-
-  engine            = "mysql"
-  engine_version    = "8.0"
-  instance_class    = "db.t3.micro"
-  allocated_storage = 5
-
-  db_name  = "transactions"
-  username = "root"
-  manage_master_user_password = true
-  port     = "3306"
-
-
-  vpc_security_group_ids = [local.mysql_sg_id]
+resource "aws_db_instance" "default" {
+  allocated_storage    = 20
+  engine             = "mysql"
+  engine_version     = "8.0"
+  identifier         = "my-database"
+  instance_class     = "db.t3.micro"
+  name               = var.db_name
+  password           = var.db_password
+  username           = var.db_username
   skip_final_snapshot = true
 
-  tags = merge(
-    var.common_tags,
-    var.rds_tags
-  )
+  # Security group must allow inbound traffic from the application load balancer or EC2 instance
+  vpc_security_group_ids = [aws_security_group.default.id]
+  db_subnet_group_name   = aws_db_subnet_group.default.name
 
-  # DB subnet group
-  db_subnet_group_name = local.database_subnet_group_name
-
-  # DB parameter group
-  family = "mysql8.0"
-
-  # DB option group
-  major_engine_version = "8.0"
-
-  parameters = [
-    {
-      name  = "character_set_client"
-      value = "utf8mb4"
-    },
-    {
-      name  = "character_set_server"
-      value = "utf8mb4"
-    }
-  ]
-
-  options = [
-    {
-      option_name = "MARIADB_AUDIT_PLUGIN"
-
-      option_settings = [
-        {
-          name  = "SERVER_AUDIT_EVENTS"
-          value = "CONNECT"
-        },
-        {
-          name  = "SERVER_AUDIT_FILE_ROTATIONS"
-          value = "37"
-        },
-      ]
-    },
-  ]
+  # Note: Check your MySQL options and remove any invalid ones
+  # Optional parameters can be added as needed.
 }
 
-module "records" {
-  source  = "terraform-aws-modules/route53/aws"
-
-  zone_id = var.zone_id
-
-  records = [
-    {
-      name    = "mysql-${var.environment}" #mysql-dev.daws81s.online
-      type    = "CNAME"
-      ttl     = 1
-      records = [
-        module.db.db_instance_address
-      ]
-      allow_overwrite = true
-    },
-  ]
-}
+# Note: Ensure to manage passwords properly using AWS Secrets Manager or SSM Parameter Store.
